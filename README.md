@@ -15,3 +15,12 @@ In order to get websockets working, you must have these headers in your Apache /
 `Upgrade $http_upgrade;`
 
 `Connection "upgrade";`
+
+
+#Updates to come in the future
+
+- Sessions instead of cookies
+
+- Reverse proxy mode
+
+- Better encoding / encryption
