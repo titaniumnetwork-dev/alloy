@@ -332,5 +332,3 @@ if (req.url == '/') {
     res.redirect(307, '/reverse' + req.url)
 } else return fs.createReadStream('public/404.html').pipe(res)
 });
-
-app.listen(8080);
