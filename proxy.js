@@ -1,7 +1,7 @@
-// Modify SSL and ports in config.json
-// To get Websockets working. You must have these headers:
-// Upgrade $http_upgrade;
-// Connection "upgrade";
+// To do list
+// load balancing 
+// websocket url rewriting
+//1. Make it define whats "/get?=https://example.org/" for hrefs and srcs that start with /
 
 const fetch = require('node-fetch');
 const express = require("express");
@@ -11,8 +11,6 @@ const cookieParser = require('cookie-parser');
 const http = require('http');
 const https = require('https');
 const websocket = require('ws');
-const { query } = require('express');
-const { RSA_NO_PADDING } = require('constants');
 
 const app = express();
 
@@ -339,3 +337,5 @@ if (req.url == '/') {
     res.redirect(307, '/reverse' + req.url)
 } else return fs.createReadStream('public/404.html').pipe(res)
 });
+
+app.listen(8080);
