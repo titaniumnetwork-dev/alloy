@@ -1,24 +1,23 @@
 {
-  "name": "prismunblocker",
-  "description": "A powerful web proxy",
+  "name": "alloyproxy",
   "version": "1.0.0",
-  "main": "index.js",
-  "keywords": [],
-  "author": "duce",
-  "homepage": "https://lime-shop.ga/",
+  "description": "A powerful web proxy!",
+  "main": "proxy.js",
   "scripts": {
-    "test": "node index.js"
+    "test": "titanium"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/titaniumnetwork-dev/alloyproxy.git"
+  },
+  "keywords": [
+    "web",
+    "proxy"
+  ],
+  "author": "titaniumnetwork-dev",
   "license": "ISC",
-  "dependencies": {
-    "@abai/proxy": "^5.0.7",
-    "cookie-parser": "^1.4.5",
-    "express": "^4.17.1",
-    "express-session": "^1.17.1",
-    "express-useragent": "^1.0.13",
-    "https": "^1.0.0",
-    "node-fetch": "^2.6.0",
-    "request": "^2.88.2",
-    "ws": "^7.3.1"
-  }
+  "bugs": {
+    "url": "https://github.com/titaniumnetwork-dev/alloyproxy/issues"
+  },
+  "homepage": "https://github.com/titaniumnetwork-dev/alloyproxy#readme"
 }
