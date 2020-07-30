@@ -64,7 +64,9 @@ app.use('/fetch/', function (req, res, next) {
           const options = {
             method: req.method,
             headers: {
-              'User-Agent': req.headers['user-agent']
+              'User-Agent': req.headers['user-agent'],
+              'X-Frame-Options': '',
+              'Content-Security-Policy': ''
             },
             redirect: 'manual',
             agent: function(_parsedURL) {
