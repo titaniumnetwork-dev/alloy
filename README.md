@@ -12,6 +12,8 @@ A powerful web proxy!
 
 `node proxy.js`
 
+The console should log where you could access the proxy at. You could change the port and everything in config.json.
+
 In order to get websockets working, you must have these headers in your Apache / Nginx:
 
 `Upgrade $http_upgrade;`
