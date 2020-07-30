@@ -1,6 +1,8 @@
-# alloyproxy
+# Alloy Proxy
 
-How to install and use:
+A powerful web proxy!
+
+# How to install and use:
 
 `git clone https://github.com/titaniumnetwork-dev/alloyproxy.git`
 
