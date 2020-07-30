@@ -10,7 +10,7 @@ A powerful web proxy!
 
 `npm install`
 
-`node proxy.js`
+`node proxy.js / npm start`
 
 The console should log where you could access the proxy at. You could change the port and everything in config.json.
 
