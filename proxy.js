@@ -1,7 +1,7 @@
-// To do list
-// load balancing 
-// websocket url rewriting
-//1. Make it define whats "/get?=https://example.org/" for hrefs and srcs that start with /
+// Modify SSL and ports in config.json
+// To get Websockets working. You must have these headers:
+// Upgrade $http_upgrade;
+// Connection "upgrade";
 
 const fetch = require('node-fetch');
 const express = require("express");
