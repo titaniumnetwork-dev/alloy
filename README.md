@@ -17,7 +17,7 @@ In order to get websockets working, you must have these headers in your Apache /
 `Connection "upgrade";`
 
 
-#Updates to come in the future
+# Updates to come in the future
 
 - Sessions instead of cookies
 
