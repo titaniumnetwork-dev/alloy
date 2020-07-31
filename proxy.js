@@ -41,8 +41,8 @@ var wss = new websocket.Server({
 app.use(cookieParser());
 
 app.use('/fetch/', function (req, res, next) {
-    (async () => {
-
+    (async () => {        
+        
         const httpAgent = new http.Agent({
             keepAlive: true
           });
@@ -67,7 +67,7 @@ app.use('/fetch/', function (req, res, next) {
           };
 
         const url = req.url.split('/').slice(2).join('/').replace(/(^:)\/\//, '/')
-
+ 
         const burl = req.url.split('/').slice(2).slice(0, 3).join('/')
 
 
@@ -97,7 +97,7 @@ app.use('/fetch/', function (req, res, next) {
           const host64 = buff.toString('base64');
           const path = location.split('/').slice(3).join('/')
           res.redirect('/fetch/' + host64 + '/' + path)
-        }
+        } 
         response.headers.forEach((e, i, a) => {
           if (i == 'content-type') ct = e;
         });
@@ -119,7 +119,7 @@ app.use('/fetch/', function (req, res, next) {
           .replace(new RegExp(`"${text}(.*?)"`), '"' + '$1' + '"')
           .replace(/<title>(.*?)<\/title>/gi, '')
           .replace(new RegExp(/integrity="(.*?)"/gi), '')
-          .replace(new RegExp(/nonce="(.*?)"/gi), '')
+          .replace(new RegExp(/nonce="(.*?)"/gi), '')          
           .replace(/src="\/\//gi, 'src="http://')
           .replace(/href="\/\//gi, 'href="http://')
           .replace(/action="\/\//gi, 'action="http://')
@@ -129,7 +129,7 @@ app.use('/fetch/', function (req, res, next) {
           .replace(/action='\/\//gi, "action='http://")
           .replace(/data='\/\//gi, "data='http://")
 
-
+          
 
           .replace(/src="\//gi, 'src="/fetch/' + testURL + '/')
           .replace(/href="\//gi, 'href="/fetch/' + testURL + '/')
@@ -140,7 +140,7 @@ app.use('/fetch/', function (req, res, next) {
           .replace(/action='\//gi, "action='/fetch/" + testURL + '/')
           .replace(/data='\//gi, "data='/fetch/" + testURL + '/')
 
-
+        
           .replace(/src="http/gi, 'src="/alloy/url/http')
           .replace(/href="http/gi, 'href="/alloy/url/http')
           .replace(/action="http/gi, 'action="/alloy/url/http')
@@ -161,26 +161,26 @@ app.use('/fetch/', function (req, res, next) {
           .replace(/setAttribute\("src",(.*?)"\/\/(.*?)"\)/gi, 'setAttribute("src",' + '$1' + '"http://' + '$2' + '")')
           .replace(/setAttribute\("src",(.*?)"http(.*?)"\)/gi, 'setAttribute("src",' + '$1' + '"/alloy/url/http' + '$2' + '")')
           .replace(/setAttribute\("src",(.*?)"\/(.*?)"\)/gi, 'setAttribute("src",' + '$1' + '"/fetch/'  + testURL +  '/' + '$2' + '")')
-
+          
           .replace(/setAttribute\("href",(.*?)"\/\/(.*?)"\)/gi, 'setAttribute("href",' + '$1' + '"http://' + '$2' + '")')
           .replace(/setAttribute\("href",(.*?)"http(.*?)"\)/gi, 'setAttribute("href",' + '$1' + '"/alloy/url/http' + '$2' + '")')
           .replace(/setAttribute\("href",(.*?)"\/(.*?)"\)/gi, 'setAttribute("href",' + '$1' + '"/fetch/'  + testURL +  '/' + '$2' + '")')
 
-
+           
          // if (fullURL == 'https://discord.com/' + pathURL) {
           //const discRewrite = body.toString()
           //.replace(/'cdn.discordapp.com'/gi,  "'" + req.hostname + "/fetch/aHR0cHM6Ly9jZG4uZGlzY29yZGFwcC5jb20=" + "'")
           //.replace(new RegExp(/integrity="(.*?)"/gi), '')
-          //.replace(new RegExp(/nonce="(.*?)"/gi), '')
+          //.replace(new RegExp(/nonce="(.*?)"/gi), '')    
           //.replace(/MARKETING_ENDPOINT: '\/\/discord.com'/gi, `MARKETING_ENDPOINT: '//${req.hostname}/fetch/aHR0cHM6Ly9kaXNjb3JkLmNvbQ==',`)
           //.replace(/MIGRATION_DESTINATION_ORIGIN: 'https:\/\/discord.com'/gi, `MIGRATION_DESTINATION_ORIGIN: '/fetch/aHR0cHM6Ly9kaXNjb3JkLmNvbQ'`)
           //.replace(/MIGRATION_SOURCE_ORIGIN: 'https:\/\/discordapp.com'/gi, `MIGRATION_SOURCE_ORIGIN: '/fetch/aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbQ=='`)
           //res.send(discRewrite)
           //}
-
+          
           res.send(textRewrite)
         } else if (ct.startsWith('text/css')) {
-          const cssRewrite = body.toString()
+          const cssRewrite = body.toString()      
           .replace(/url\(\/\//gi, 'url(http://')
           .replace(/url\("\//gi, 'url("' + '/fetch/' + testURL + '/')
           .replace(/url\('\//gi, "url('" + '/fetch/' + testURL + '/')
@@ -203,7 +203,7 @@ app.use('/fetch/', function (req, res, next) {
         } else {
           res.send(body)
         }
-
+    
       })();
 
 if (req.url == '/fetch/aHR0cHM6Ly9kaXNjb3JkLmNvbQ==/') {
@@ -215,8 +215,8 @@ if (req.url == '/fetch/aHR0cHM6Ly9kaXNjb3JkLmNvbQ==/') {
 
 // NOT READY YET REVERSE PROXY MODE IS NOT READY YET
 app.use('/rv/',function (req, res, next) {
-    (async () => {
-
+    (async () => {        
+        
       const httpAgent = new http.Agent({
         keepAlive: true
       });
@@ -236,10 +236,10 @@ app.use('/rv/',function (req, res, next) {
             return httpsAgent;
           }
         }
-      };
+      }; 
 
         const url = req.url.split('/').slice(2).join('/')
-
+ 
         res.cookie('option', 'reverse', { maxAge: 256000 });
         const response = await fetch(req.cookies['rURL'] + req.url.replace('\/reverse\/', '/'), options).catch(err => fs.createReadStream('public/404.html').pipe(res));
         const body = await response.buffer()
@@ -262,17 +262,17 @@ app.use('/rv/',function (req, res, next) {
           .replace(new RegExp(`"${req.cookies['rURL']}(.*?)"`), '"' + '$1' + '"')
           .replace(/<title>(.*?)<\/title>/gi, '')
           .replace(new RegExp(/integrity="(.*?)"/gi), '')
-          .replace(new RegExp(/nonce="(.*?)"/gi), '')
+          .replace(new RegExp(/nonce="(.*?)"/gi), '')          
           .replace(/src="\/\//gi, 'src="http://')
           .replace(/href="\/\//gi, 'href="http://')
           .replace(/action="\/\//gi, 'action="http://')
-
+          
 
 
           .replace(/src="\//gi, 'src="/rv/')
           .replace(/href="\//gi, 'href="/rv/')
           .replace(/action="\//gi, 'action="/rv/')
-
+        
           .replace(/src="http/gi, 'src="/alloy/url/http')
           .replace(/href="http/gi, 'href="/alloy/url/http')
           .replace(/action="http/gi, 'action="/alloy/url/http')
@@ -281,29 +281,29 @@ app.use('/rv/',function (req, res, next) {
 
           .replace(/'(?!.*\/fetch\/)http:\/\/(.*?)'/gi, "'/alloy/url/http://" + '$1' + "'")
           .replace(/'(?!.*\/fetch\/)https:\/\/(.*?)'/gi, "'/alloy/url/https://" + '$1' + "'")
-
+           
           .replace(/'cdn.discordapp.com'/gi,  "'" + req.hostname + "/fetch/aHR0cHM6Ly9jZG4uZGlzY29yZGFwcC5jb20=" + "'")
           .replace(new RegExp(/integrity="(.*?)"/gi), '')
-          .replace(new RegExp(/nonce="(.*?)"/gi), '')
+          .replace(new RegExp(/nonce="(.*?)"/gi), '')   
 
           //.replace(/MARKETING_ENDPOINT: '\/\/discord.com'/gi, `MARKETING_ENDPOINT: '//${req.hostname}/fetch/aHR0cHM6Ly9kaXNjb3JkLmNvbQ==',`)
           //.replace(/MIGRATION_DESTINATION_ORIGIN: 'https:\/\/discord.com'/gi, `MIGRATION_DESTINATION_ORIGIN: '/fetch/aHR0cHM6Ly9kaXNjb3JkLmNvbQ'`)
           //.replace(/MIGRATION_SOURCE_ORIGIN: 'https:\/\/discordapp.com'/gi, `MIGRATION_SOURCE_ORIGIN: '/fetch/aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbQ=='`)
-
+        
           res.send(textRewrite)
         } else if (ct.startsWith('text/css')) {
-          const cssRewrite = body.toString()
-
+          const cssRewrite = body.toString()      
+            
           res.send(cssRewrite)
         } else if (ct.startsWith('text/javascript') || ct.startsWith('application/javascript')) {
-          const jsRewrite = body.toString()
-
-
+          const jsRewrite = body.toString()     
+          
+    
           res.send(jsRewrite)
         } else {
           res.send(body)
         }
-
+    
       })();
 })
 
@@ -340,7 +340,7 @@ const host = uncoded.split('/').slice(0, 3).join('/')
 })
 
 
-app.use(function (req, res, next) {
+app.use(function (req, res, next) { 
 if (req.url == '/') {
    return fs.createReadStream('public/index.html').pipe(res)
 } else if (req.cookies['option'] == 'normal') {
@@ -349,3 +349,5 @@ if (req.url == '/') {
     res.redirect(307, '/reverse' + req.url)
 } else return fs.createReadStream('public/404.html').pipe(res)
 });
+          
+  
