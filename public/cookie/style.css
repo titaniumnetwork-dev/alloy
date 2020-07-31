@@ -1,0 +1,42 @@
+body{
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 16px;
+    background-color: 
+}
+
+.btext{
+    color: #f9f3f4;
+    position: absolute;
+    text-align: center;
+    top: 30%;
+    width: 100%;
+    line-height: 0.4em;
+}
+
+h1{
+    font-size: 50px;
+}
+
+.btn{
+    color: #fff;
+    text-decoration: none;
+    border: #ccc 1px solid;
+    padding: 10px 15px;
+    border-radius: 8px;
+    line-height: 4em;
+}
+
+.btn:hover{
+    color: #b19295;
+    border: #fff 1px solid;
+}
+
+#particles-js{
+    width: 100%;
+    bottom: 0;
+    top: 0;
+    position: absolute;
+    background-color: #3399ff;
+    overflow: hidden;
+}

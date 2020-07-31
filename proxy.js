@@ -1,8 +1,3 @@
-// To do list
-// load balancing 
-// websocket url rewriting
-//1. Make it define whats "/get?=https://example.org/" for hrefs and srcs that start with /
-
 const fetch = require('node-fetch');
 const express = require("express");
 const url = require('url');
@@ -43,9 +38,6 @@ var wss = new websocket.Server({
   server: server,
 }), conns = 0;
 
-require('./ws.js')(wss, conns);
-
-
 app.use(cookieParser());
 
 app.use('/fetch/', function (req, res, next) {
@@ -81,21 +73,20 @@ app.use('/fetch/', function (req, res, next) {
 
         const testURL = req.url.split('/').slice(1).slice(0, 1).join('/')
         const pathURL = req.url.split('/').slice(2).join('/')
-        console.log(pathURL)
-        console.log(testURL)
         const buff = new Buffer(testURL, 'base64');
         const text = buff.toString('ascii');
         const testURL2 = req.url.split('/').slice(2)
         testURL2.shift()
         const testURLpath = testURL2.join('/')
-        console.log(text)
-        console.log(testURLpath)
         const fullURL = text + '/' + pathURL
-        console.log(fullURL)
         res.cookie('option', 'normal', { maxAge: 256000 });
+        const gettingLocationHostname = fullURL.split('/')
+        gettingLocationHostname.shift()
+        gettingLocationHostname.shift()
+        const locationHostname = gettingLocationHostname.slice(0, 1).join('/')
         const entireURL = testURL + pathURL
         const response = await fetch(fullURL.replace(/(^:)\/\//, '/'), options).catch(err => fs.createReadStream('public/404.html').pipe(res));
-        const body = await response.buffer()
+        const body = await response.buffer().catch(console.log('Promise rejection catched!'))
         var ct = 'notset'
         const location = response.headers.get("Location");
 
@@ -122,6 +113,9 @@ app.use('/fetch/', function (req, res, next) {
           .replace(/xhr.open\("GET",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhr.open("GET",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
           .replace(/xhr.open\("POST",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhr.open("POST",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
           .replace(/xhr.open\("OPTIONS",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhr.open("OPTIONS",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
+          .replace(/ajax\("http(.*?)"\)/gi, 'ajax("/alloy/url/http' + '$1' + '")')
+          .replace(/window.location.hostname/gi, `"${locationHostname}"`)
+           .replace(/location.hostname/gi, `"${locationHostname}"`)
           .replace(new RegExp(`"${text}(.*?)"`), '"' + '$1' + '"')
           .replace(/<title>(.*?)<\/title>/gi, '')
           .replace(new RegExp(/integrity="(.*?)"/gi), '')
@@ -156,8 +150,21 @@ app.use('/fetch/', function (req, res, next) {
 
           .replace(/'(?!.*\/fetch\/)http:\/\/(.*?)'/gi, "'/alloy/url/http://" + '$1' + "'")
           .replace(/'(?!.*\/fetch\/)https:\/\/(.*?)'/gi, "'/alloy/url/https://" + '$1' + "'")
-          .replace(/"(?!.*\/fetch\/)(?!.*\/alloy\/url\/\/)(.*?).googlevideo.com/gi, '"\\\/alloy\\\/url\\\/' + '$1' + '.googlevideo.com')
           .replace(/'cdn.discordapp.com'/gi,  "'" + req.hostname + "/fetch/aHR0cHM6Ly9jZG4uZGlzY29yZGFwcC5jb20=" + "'")
+          .replace(/<head>/gi, '<head><script src="/alloy/static/xml.js"></script>')
+          .replace(/url\(\/\//gi, 'url(http://')
+          .replace(/url\("\//gi, 'url("' + '/fetch/' + testURL + '/')
+          .replace(/url\('\//gi, "url('" + '/fetch/' + testURL + '/')
+          .replace(/url\('http/gi, "url('/alloy/url/http")
+          .replace(/url\("http/gi, 'url("/alloy/url/http')
+          .replace(/url\(http/gi, "url(/alloy/url/http")
+          .replace(/setAttribute\("src",(.*?)"\/\/(.*?)"\)/gi, 'setAttribute("src",' + '$1' + '"http://' + '$2' + '")')
+          .replace(/setAttribute\("src",(.*?)"http(.*?)"\)/gi, 'setAttribute("src",' + '$1' + '"/alloy/url/http' + '$2' + '")')
+          .replace(/setAttribute\("src",(.*?)"\/(.*?)"\)/gi, 'setAttribute("src",' + '$1' + '"/fetch/'  + testURL +  '/' + '$2' + '")')
+          
+          .replace(/setAttribute\("href",(.*?)"\/\/(.*?)"\)/gi, 'setAttribute("href",' + '$1' + '"http://' + '$2' + '")')
+          .replace(/setAttribute\("href",(.*?)"http(.*?)"\)/gi, 'setAttribute("href",' + '$1' + '"/alloy/url/http' + '$2' + '")')
+          .replace(/setAttribute\("href",(.*?)"\/(.*?)"\)/gi, 'setAttribute("href",' + '$1' + '"/fetch/'  + testURL +  '/' + '$2' + '")')
 
            
          // if (fullURL == 'https://discord.com/' + pathURL) {
@@ -174,6 +181,7 @@ app.use('/fetch/', function (req, res, next) {
           res.send(textRewrite)
         } else if (ct.startsWith('text/css')) {
           const cssRewrite = body.toString()      
+          .replace(/url\(\/\//gi, 'url(http://')
           .replace(/url\("\//gi, 'url("' + '/fetch/' + testURL + '/')
           .replace(/url\('\//gi, "url('" + '/fetch/' + testURL + '/')
           .replace(/url\('http/gi, "url('/alloy/url/http")
@@ -189,7 +197,8 @@ app.use('/fetch/', function (req, res, next) {
            .replace(/xhr.open\("GET",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhr.open("GET",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
            .replace(/xhr.open\("POST",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhr.open("POST",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
            .replace(/xhr.open\("OPTIONS",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhr.open("OPTIONS",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
-
+           .replace(/ajax\("http:\/\/(.*?)"\)/gi, 'ajax("/alloy/url/http://' + '$1' + '")')
+           .replace(/ajax\("https:\/\/(.*?)"\)/gi, 'ajax("/alloy/url/https://' + '$1' + '")')
            res.send(jsRewrite)
         } else {
           res.send(body)
@@ -275,7 +284,8 @@ app.use('/rv/',function (req, res, next) {
            
           .replace(/'cdn.discordapp.com'/gi,  "'" + req.hostname + "/fetch/aHR0cHM6Ly9jZG4uZGlzY29yZGFwcC5jb20=" + "'")
           .replace(new RegExp(/integrity="(.*?)"/gi), '')
-          .replace(new RegExp(/nonce="(.*?)"/gi), '')    
+          .replace(new RegExp(/nonce="(.*?)"/gi), '')   
+
           //.replace(/MARKETING_ENDPOINT: '\/\/discord.com'/gi, `MARKETING_ENDPOINT: '//${req.hostname}/fetch/aHR0cHM6Ly9kaXNjb3JkLmNvbQ==',`)
           //.replace(/MIGRATION_DESTINATION_ORIGIN: 'https:\/\/discord.com'/gi, `MIGRATION_DESTINATION_ORIGIN: '/fetch/aHR0cHM6Ly9kaXNjb3JkLmNvbQ'`)
           //.replace(/MIGRATION_SOURCE_ORIGIN: 'https:\/\/discordapp.com'/gi, `MIGRATION_SOURCE_ORIGIN: '/fetch/aHR0cHM6Ly9kaXNjb3JkYXBwLmNvbQ=='`)
@@ -297,7 +307,9 @@ app.use('/rv/',function (req, res, next) {
       })();
 })
 
-// For base64 encoding the websites HTTP Protocall and host
+
+app.use('/alloy/static/', express.static('static'))
+
 app.use('/alloy/url/',function (req, res, next) {
   const mainurl = req.url.split('/').slice(1).join('/')
   const host = mainurl.split('/').slice(0, 3).join('/')
@@ -307,7 +319,7 @@ app.use('/alloy/url/',function (req, res, next) {
   console.log(host64)
   console.log(path)
   const fullURL = host64 +  '/' + path
-  res.redirect('/fetch/' +  fullURL)
+  res.redirect(307, '/fetch/' +  fullURL)
 })
 
 app.use('/alloy/',function (req, res, next) {
@@ -337,5 +349,5 @@ if (req.url == '/') {
     res.redirect(307, '/reverse' + req.url)
 } else return fs.createReadStream('public/404.html').pipe(res)
 });
-
-app.listen(8080);
+          
+  
