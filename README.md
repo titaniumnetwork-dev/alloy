@@ -4,9 +4,9 @@ A powerful web proxy!
 
 # How to install and use:
 
-`git clone https://github.com/titaniumnetwork-dev/alloyproxy.git`
+`git clone https://github.com/titaniumnetwork-dev/alloyproxy-beta.git`
 
-`cd alloyproxy`
+`cd alloyproxy-beta`
 
 `npm install`
 
