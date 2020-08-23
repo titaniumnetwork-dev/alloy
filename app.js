@@ -5,7 +5,6 @@ const fs = require('fs')
 const cookieParser = require('cookie-parser');
 const http = require('http');
 const https = require('https');
-const ws = require('websocket');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const { response } = require('express');
@@ -266,39 +265,6 @@ app.use('/alloy/url/',function (req, res, next) {
   console.log(path)
   const fullURL = host64 +  '/' + path
   res.redirect(307, '/fetch/' +  fullURL)
-})
-
-
-app.use('/alloy/ws/', function (req, res, next) {
-  let wss = new ws.server({
-    httpServer: server,
-  });
-  
-  wss.on('connection', (conn) => {
-    let urlParams = Object.fromEntries(
-      conn.url.split('?')[1].split('&').map((a=>{
-        let x = a.split('=');
-        return [ x.splice(0,1)[0], x.join('=') ];
-      }))
-    );
-    // https://www.npmjs.com/package/ws
-    if(!urlParams.url) return conn.close();
-    let cli = new ws.client(); // or whatever the function is
-    cli.connect(urlParams.url);
-    conn.on('message', (data) => {
-      cli.send(data);
-    });
-    conn.on('close', (code) => {
-      cli.close(code);
-    });
-    cli.on('message', (data) => {
-      conn.send(data);
-    });
-    cli.on('close', (code) => {
-      conn.close(code);
-    });
-  });
-
 })
 
 app.use('/alloy/rv/', function (req, res ,next) {
