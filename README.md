@@ -10,21 +10,13 @@ A powerful web proxy!
 
 `npm install`
 
-`node proxy.js / npm start`
+`npm start`
 
-The console should log where you could access the proxy at. You could change the port and everything in config.json.
-
-In order to get websockets working, you must have these headers in your Apache / Nginx:
-
-`Upgrade $http_upgrade;`
-
-`Connection "upgrade";`
+The default place for the proxy when its started is `https://localhost:443` but feel free to change it in the feature
 
 
 # Updates to come in the future
 
-- Sessions instead of cookies
-
 - Reverse proxy mode
 
-- Better encoding / encryption
+- Full URL encoding / encryption mode
