@@ -19,6 +19,8 @@ The default place for the proxy when its started is `https://localhost:443` but 
 The proxy works by using node-fetch (Basically Window.fetch ported to Node-js). 
 Basically what the app is doing is node-fetch is sending the request to the server then
 the app sends the response back to the server with the modifactions made to the attributes and elements.
+When a attribute is rewritten, depending on the contents inside. It will turn:
+`href="/assets/js/main.js"` into `href="/fetch/base64EncodedwebsiteURL/assets/js/main.js"`
 
 
 # Updates to come in the future
