@@ -26,6 +26,20 @@ When a attribute is rewritten, depending on the contents inside. It will turn:
 
 A porition of its rewriting is in client-side JS so `Element.setAttribute`, `window.fetch()`, XMLHttpRequest, and more are rewritten.
 
+# Known websites that work
+
+- Google Search
+
+- Discord (only if the API is proxied through something else such as Nginx due to an issue)
+
+- LittleBigSnake
+
+- Youtube (Everything works fine, replaceState() and pushState() need to be rewritten though)
+
+- Y8
+
+and plenty more!
+
 
 # Updates to come in the future
 
