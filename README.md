@@ -48,9 +48,12 @@ and plenty more!
 
 - Recaptcha which can hopefully be fixed
 
+- Unhandled promise rejection which is easy.
 
 # Updates to come in the future
 
 - Reverse proxy mode
 
 - Full URL encoding / encryption mode
+
+- A websocket proxy that doesn't crash
