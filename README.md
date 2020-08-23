@@ -40,6 +40,14 @@ A porition of its rewriting is in client-side JS so `Element.setAttribute`, `win
 
 and plenty more!
 
+# Known issues that need to be fixed
+
+- Post data
+
+- Header rewriting
+
+- Recaptcha which can hopefully be fixed
+
 
 # Updates to come in the future
 
