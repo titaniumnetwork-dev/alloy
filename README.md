@@ -30,29 +30,29 @@ A porition of its rewriting is in client-side JS so `Element.setAttribute`, `win
 
 - Google Search
 
-- Discord (only if the API is proxied through something else such as Nginx due to an issue)
+- Discord (Messages wont send D: )
 
 - LittleBigSnake
+
+- ShellShock.io
 
 - Youtube (Everything works fine, replaceState() and pushState() need to be rewritten though)
 
 - Y8
 
+- 1v1.LOL
+
+- Old Reddit
+
 and plenty more!
 
 # Known issues that need to be fixed
 
-- Post data
+- Better post data handling
 
 - Header rewriting
 
-- Recaptcha which can hopefully be fixed
-
-- Unhandled promise rejection which is easy.
-
 # Updates to come in the future
-
-- Reverse proxy mode
 
 - Full URL encoding / encryption mode
 
