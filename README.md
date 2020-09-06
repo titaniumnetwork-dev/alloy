@@ -12,7 +12,7 @@ A powerful web proxy!
 
 `npm start`
 
-The default place for the proxy when its started is `https://localhost:443` but feel free to change it in the feature
+The default place for the proxy when its started is `https://localhost:443` but feel free to change it in config.json!
 
 # How the proxy works:
 
@@ -30,11 +30,11 @@ A porition of its rewriting is in client-side JS so `Element.setAttribute`, `win
 
 - Google Search
 
-- Discord (Messages wont send D: )
+- Discord
 
 - LittleBigSnake
 
-- ShellShock.io
+- Surviv.io
 
 - Youtube (Everything works fine, replaceState() and pushState() need to be rewritten though)
 
@@ -48,12 +48,12 @@ and plenty more!
 
 # Known issues that need to be fixed
 
-- Better post data handling
+- Better POST body parsing instead of using body-parser.
 
-- Header rewriting
+- Cookie header rewriting
 
 # Updates to come in the future
 
 - Full URL encoding / encryption mode
 
-- A websocket proxy that doesn't crash
+- Websocket proxing
