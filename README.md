@@ -36,7 +36,7 @@ A porition of its rewriting is in client-side JS so `Element.setAttribute`, `win
 
 - Surviv.io
 
-- Youtube (Everything works fine, replaceState() and pushState() need to be rewritten though)
+- Youtube
 
 - Y8
 
