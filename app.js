@@ -7,6 +7,7 @@ var app = express();
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 var bodyParser = require('body-parser');
+var sanitizer = require('sanitizer');
 
 var config = JSON.parse(fs.readFileSync('config.json', 'utf-8')),
   httpsAgent = new https.Agent({
