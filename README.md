@@ -26,6 +26,10 @@ When a attribute is rewritten, depending on the contents inside. It will turn:
 
 A porition of its rewriting is in client-side JS so `Element.setAttribute`, `window.fetch()`, XMLHttpRequest, and more are rewritten.
 
+# Extra information:
+
+If your gonna have an external website redirect to this proxy. Then we recommend you have the value base64 encoded and redirected to `/alloy?url=` then value.
+
 # Known websites that work
 
 - Google Search
