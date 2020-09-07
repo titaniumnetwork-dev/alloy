@@ -1,6 +1,6 @@
 # Alloy Proxy
 
-A powerful web proxy!
+A node.js proxy that features URL encoding, and amazing compatablity!
 
 # How to install and use:
 
