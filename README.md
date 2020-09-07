@@ -4,9 +4,9 @@ A node.js proxy that features URL encoding, and amazing compatablity!
 
 # How to install and use:
 
-`git clone https://github.com/titaniumnetwork-dev/alloyproxy-beta.git`
+`git clone https://github.com/titaniumnetwork-dev/alloyproxy.git`
 
-`cd alloyproxy-beta`
+`cd alloyproxy`
 
 `npm install`
 
