@@ -173,7 +173,7 @@ app.use(prefix, async (req, res, next) => {
     }
     return res.redirect(307, '/fetch/' + base64Encode('https://old.reddit.com') + location.path)
   }
-  const response = await fetch(location.href, options).catch(err => res.send(error('404', `"${location.href}" was not found!`)));
+  const response = await fetch(location.href, options).catch(err => res.send(error('404', `"${sanitizer.escape(location.href)}" was not found!`))); // use sanitizer to prevent XSS
   if(typeof response.buffer != 'function')return;
   var resbody = await response.buffer();
   var contentType = 'text/plain'
