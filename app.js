@@ -6,7 +6,6 @@ var fs = require('fs');
 var app = express();
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
-var bodyParser = require('body-parser');
 
 var config = JSON.parse(fs.readFileSync('config.json', 'utf-8')),
   httpsAgent = new https.Agent({
@@ -40,10 +39,32 @@ saveUninitialized: true,
 resave: true
 }));
 
-app.use(bodyParser.urlencoded({ extended: false }))
-
-// To parse POST data
-app.use(bodyParser.json())
+app.use((req, res, next)=>{
+	// nice bodyparser alternative that wont cough up errors
+	
+	req.setEncoding('utf8');
+	req.raw_body = ''
+	req.body = new Object()
+	
+	req.on('data', chunk=>{ req.raw_body += chunk });
+	
+	req.on('end', ()=>{
+		req.str_body = req.raw_body.toString('utf8');
+		
+		try{
+			var result = new Object();
+			
+			req.str_body.split('&').forEach((pair)=>{
+				pair = pair.split('=');
+				req.body[pair[0]] = decodeURIComponent(pair[1] || '');
+			});
+		}catch(err){
+			req.body = {}
+		}
+		
+		return next();
+	});
+});
 
 function base64Encode(data) {
   return new Buffer.from(data).toString('base64')
@@ -141,13 +162,12 @@ app.use(prefix, async (req, res, next) => {
       }
     }
   };
-  var fetchPost = Object.fromEntries(
-    Object.entries(JSON.parse(JSON.stringify(req.body)))
-  );
+  
   if (req.method == 'POST') {
     // Have to do try catch for this POST data parser until we create our own one that won't have a syntax error sometimes.
     try {
-      options['body'] = JSON.stringify(fetchPost)
+	  // str_body is a string containing the requests body
+      options['body'] = req.str_body;
     }catch(err){
       return;
     }
