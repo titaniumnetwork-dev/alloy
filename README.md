@@ -1,6 +1,7 @@
 # Alloy Proxy
 
 A node.js proxy that features URL encoding, and amazing compatablity!
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/titaniumnetwork-dev/alloyproxy/)
 
 # How to install and use:
 
