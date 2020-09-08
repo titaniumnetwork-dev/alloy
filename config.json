@@ -1,5 +1,5 @@
 {
 	"listenip":"0.0.0.0",
-	"port":443,
-	"ssl":true
+	"port":8080,
+	"ssl":false
 }
