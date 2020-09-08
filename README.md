@@ -14,7 +14,7 @@ A node.js proxy that features URL encoding, and amazing compatablity!
 
 `npm start`
 
-The default place for the proxy when its started is `https://localhost:443` but feel free to change it in config.json!
+The default place for the proxy when its started is `http://localhost:8080` but feel free to change it in config.json!
 
 # How the proxy works:
 
