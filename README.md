@@ -32,6 +32,10 @@ A porition of its rewriting is in client-side JS so `Element.setAttribute`, `win
 
 If your gonna have an external website redirect to this proxy. Then we recommend you have the value base64 encoded and redirected to `/alloy?url=` then value.
 
+# Deploying to Heroku:
+
+If your gonna be hosting this on something like Heroku. You need to make sure SSL mode is turned off so this will work.
+
 # Known websites that work
 
 - Google Search
