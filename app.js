@@ -6,7 +6,6 @@ var fs = require('fs');
 var app = express();
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
-var bodyParser = require('body-parser');
 
 var config = JSON.parse(fs.readFileSync('config.json', 'utf-8')),
   httpsAgent = new https.Agent({
@@ -40,10 +39,32 @@ saveUninitialized: true,
 resave: true
 }));
 
-app.use(bodyParser.urlencoded({ extended: false }))
-
-// To parse POST data
-app.use(bodyParser.json())
+app.use((req, res, next)=>{
+	// nice bodyparser alternative that wont cough up errors
+	
+	req.setEncoding('utf8');
+	req.raw_body = ''
+	req.body = new Object()
+	
+	req.on('data', chunk=>{ req.raw_body += chunk });
+	
+	req.on('end', ()=>{
+		req.str_body = req.raw_body.toString('utf8');
+		
+		try{
+			var result = new Object();
+			
+			req.str_body.split('&').forEach((pair)=>{
+				pair = pair.split('=');
+				req.body[pair[0]] = decodeURIComponent(pair[1] || '');
+			});
+		}catch(err){
+			req.body = {}
+		}
+		
+		return next();
+	});
+});
 
 function base64Encode(data) {
   return new Buffer.from(data).toString('base64')
@@ -103,6 +124,7 @@ app.post('/createSession', async (req, res) => {
 var prefix = '/fetch';
 
 app.use(prefix, async (req, res, next) => {
+  req.session.rvURL = 'https://www.y8.com'
   var location = rewriteURL(req.url.slice(1), 'decode');
   if (req.url.startsWith('/rv') && !req.session.rvURL) {
     res.send(error('400', 'No valid session URL for reverse proxy mode was found!'))
@@ -129,6 +151,9 @@ app.use(prefix, async (req, res, next) => {
    fetchHeaders['referer'] = location.href
    fetchHeaders['origin'] = location.origin
    fetchHeaders['host'] = location.hostname
+   if (fetchHeaders['cookie']) {
+     delete fetchHeaders['cookie']
+   }
    var options = {
     method: req.method,
     headers: fetchHeaders,
@@ -141,13 +166,12 @@ app.use(prefix, async (req, res, next) => {
       }
     }
   };
-  var fetchPost = Object.fromEntries(
-    Object.entries(JSON.parse(JSON.stringify(req.body)))
-  );
+  
   if (req.method == 'POST') {
     // Have to do try catch for this POST data parser until we create our own one that won't have a syntax error sometimes.
     try {
-      options['body'] = JSON.stringify(fetchPost)
+	  // str_body is a string containing the requests body
+      options['body'] = req.str_body;
     }catch(err){
       return;
     }
@@ -162,7 +186,7 @@ app.use(prefix, async (req, res, next) => {
       return;
     }
     }
-  if (location.href == 'https://discord.com/' || location.href == 'https://discord.com/new') {
+  if (location.href == 'https://discord.com' || location.href == 'https://discord.com/new') {
     return res.redirect(307, `/fetch/${location.origin_encoded}/login`)
   }
   if (location.origin == 'https://www.reddit.com') {
@@ -208,81 +232,49 @@ app.use(prefix, async (req, res, next) => {
   if (contentType.startsWith('text/html')) {
     req.session.fetchURL = location.origin_encoded
     resbody = resbody.toString()
-    .replace(/xhttp.open\("GET",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhttp.open("GET",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
-          .replace(/xhttp.open\("POST",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhttp.open("POST",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
-          .replace(/xhttp.open\("OPTIONS",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhttp.open("OPTIONS",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
+    .replace(/integrity="(.*?)"/gi, '')
+    .replace(/nonce="(.*?)"/gi, '')
+    .replace(/(href|src|poster|data|action)="\/\/(.*?)"/gi, `$1` + `="http://` + `$2` + `"`)
+    .replace(/(href|src|poster|data|action)='\/\/(.*?)'/gi, `$1` + `='http://` + `$2` + `'`)
+    .replace(/(href|src|poster|data|action)="\/(.*?)"/gi, `$1` + `="/fetch/${location.origin_encoded}/` + `$2` + `"`)
+    .replace(/(href|src|poster|data|action)='\/(.*?)'/gi, `$1` + `='/fetch/${location.origin_encoded}/` + `$2` + `'`)
+    .replace(/'(https:\/\/|http:\/\/)(.*?)'/gi, function(str) {
+      str = str.split(`'`).slice(1).slice(0, -1).join(``);
+      return `'/fetch/${rewriteURL(str)}'`
+    })
+    .replace(/"(https:\/\/|http:\/\/)(.*?)"/gi, function(str) {
+      str = str.split(`"`).slice(1).slice(0, -1).join(``);
+      return `"/fetch/${rewriteURL(str)}"`
+    })
+    .replace(/(window|document).location.href/gi, `"${location.href}"`)
+    .replace(/(window|document).location.hostname/gi, `"${location.hostname}"`)
+    .replace(/(window|document).location.pathname/gi, `"${location.path}"`)
+    .replace(/location.href/gi, `"${location.href}"`)
+    .replace(/location.hostname/gi, `"${location.hostname}"`)
+    .replace(/location.pathname/gi, `"${location.path}"`)
+    .replace(/<html(.*?)>/gi, '<html'  + '$1'  + '><script id="alloyData" data-alloyURL="' + location.origin_encoded + '"' + ' src="/alloy/assets/inject.js"></script>')
 
-          .replace(/xhr.open\("GET",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhr.open("GET",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
-          .replace(/xhr.open\("POST",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhr.open("POST",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
-          .replace(/xhr.open\("OPTIONS",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhr.open("OPTIONS",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')
-          .replace(/ajax\("http(.*?)"\)/gi, 'ajax("/alloy/url/http' + '$1' + '")')
-          .replace(/window.location.href/gi, `"${location.href}"`)
-          .replace(/window.location.hostname/gi, `"${location.hostname}"`)
-          .replace(/window.location.pathname/gi, `"${location.path}"`)
-          .replace(/document.location.href/gi, `"${location.href}"`)
-          .replace(/document.location.hostname/gi, `"${location.hostname}"`)
-          .replace(/document.location.pathname/gi, `"${location.path}"`)
-          .replace(/location.href/gi, `"${location.href}"`)
-          .replace(/location.hostname/gi, `"${location.hostname}"`)
-          .replace(/location.pathname/gi, `"${location.path}"`)
-          .replace(/<title>(.*?)<\/title>/gi, '<title>Alloy</title>')
-          .replace(new RegExp(/integrity="(.*?)"/gi), '')
-          .replace(new RegExp(/nonce="(.*?)"/gi), '')          
-          .replace(/src="\/\//gi, 'src="http://')
-          .replace(/href="\/\//gi, 'href="http://')
-          .replace(/action="\/\//gi, 'action="http://')
-          .replace(/data="\/\//gi, 'data="http://')
-          .replace(/src='\/\//gi, "src='http://")
-          .replace(/href='\/\//gi, "href='http://")
-          .replace(/action='\/\//gi, "action='http://")
-          .replace(/data='\/\//gi, "data='http://")
-
-          
-
-          .replace(/src="\//gi, 'src="/fetch/' + location.origin_encoded + '/')
-          .replace(/href="\//gi, 'href="/fetch/' + location.origin_encoded + '/')
-          .replace(/action="\//gi, 'action="/fetch/' + location.origin_encoded + '/')
-          .replace(/data="\//gi, 'data="/fetch/' + location.origin_encoded + '/')
-          .replace(/src='\//gi, "src='/fetch/" + location.origin_encoded + '/')
-          .replace(/href='\//gi, "href='/fetch/" + location.origin_encoded + '/')
-          .replace(/action='\//gi, "action='/fetch/" + location.origin_encoded + '/')
-          .replace(/data='\//gi, "data='/fetch/" + location.origin_encoded + '/')
-
-        
-          .replace(/src="http/gi, 'src="/alloy/url/http')
-          .replace(/href="http/gi, 'href="/alloy/url/http')
-          .replace(/action="http/gi, 'action="/alloy/url/http')
-          .replace(/data="http/gi, 'action="/alloy/url/http')
-          .replace(/"(?!.*\/fetch\/)http:\/\/(.*?)"/gi, '"/alloy/url/http://' + '$1' + '"')
-          .replace(/"(?!.*\/fetch\/)https:\/\/(.*?)"/gi, '"/alloy/url/https://' + '$1' + '"')
-
-          .replace(/'(?!.*\/fetch\/)http:\/\/(.*?)'/gi, "'/alloy/url/http://" + '$1' + "'")
-          .replace(/'(?!.*\/fetch\/)https:\/\/(.*?)'/gi, "'/alloy/url/https://" + '$1' + "'")
-          .replace(/<html(.*?)>/gi, '<html'  + '$1'  + '><script id="alloyData" data-alloyURL="' + location.origin_encoded + '"' + ' src="/alloy/assets/inject.js"></script>')
-          .replace(/url\(\/\//gi, 'url(http://')
-          .replace(/url\("\//gi, 'url("' + '/fetch/' + location.origin_encoded + '/')
-          .replace(/url\('\//gi, "url('" + '/fetch/' + location.origin_encoded + '/')
-          .replace(/url\('http/gi, "url('/alloy/url/http")
-          .replace(/url\("http/gi, 'url("/alloy/url/http')
-          .replace(/url\(http/gi, "url(/alloy/url/http")
-         .replace(/"\/alloy\/url\/(.*?)"/gi,  function (str) {
-            const Data = str.split(`"`).splice(1)
-            Data.pop()
-            return `"/fetch/${rewriteURL(Data.join(`"`).toString().replace('/alloy/url/', ''))}"`
-          })
-           .replace(/'\/alloy\/url\/(.*?)'/gi,  function (str) {
-            const Data = str.split(`'`).splice(1)
-            Data.pop()
-            return `'/fetch/${rewriteURL(Data.join(`'`).toString().replace('/alloy/url/', ''))}'`
-          })
         } else if (contentType.startsWith('text/css')) {
           resbody = resbody.toString()      
-          .replace(/url\(\/\//gi, 'url(http://')
-          .replace(/url\("\//gi, 'url("' + '/fetch/' + location.origin_encoded + '/')
-          .replace(/url\('\//gi, "url('" + '/fetch/' + location.origin_encoded + '/')
-          .replace(/url\('http/gi, "url('/alloy/url/http")
-          .replace(/url\("http/gi, 'url("/alloy/url/http')
-          .replace(/url\(http/gi, "url(/alloy/url/http")
+          .replace(/url\("\/\/(.*?)"\)/gi, `url("http://` + `$1` + `")`)
+          .replace(/url\('\/\/(.*?)'\)/gi, `url('http://` + `$1` + `')`)
+          .replace(/url\(\/\/(.*?)\)/gi, `url(http://` + `$1` + `)`)
+          .replace(/url\("\/(.*?)"\)/gi, `url("/fetch/${location.origin_encoded}/` + `$1` + `")`)
+          .replace(/url\('\/(.*?)'\)/gi, `url('/fetch/${location.origin_encoded}/` + `$1` + `')`)
+          .replace(/url\(\/(.*?)\)/gi, `url(/fetch/${location.origin_encoded}/` + `$1` + `)`)
+          .replace(/"(https:\/\/|http:\/\/)(.*?)"/gi, function(str) {
+            str = str.split(`"`).slice(1).slice(0, -1).join(``);
+            return `"/fetch/${rewriteURL(str)}"`
+          })
+          .replace(/'(https:\/\/|http:\/\/)(.*?)'/gi, function(str) {
+            str = str.split(`'`).slice(1).slice(0, -1).join(``);
+            return `'/fetch/${rewriteURL(str)}'`
+          })
+          .replace(/\((https:\/\/|http:\/\/)(.*?)\)/gi, function(str) {
+            str = str.split(`(`).slice(1).join(``).split(')').slice(0, -1).join('');
+            return `(/fetch/${rewriteURL(str)})`
+          })
+
         } else if (contentType.startsWith('text/javascript') || contentType.startsWith('application/javascript')) {
           resbody = resbody.toString()
            .replace(/xhttp.open\("GET",(.*?)"http(.*?)"(.*?),(.*?)true\);/gi, ' xhttp.open("GET",' + '$1' + '"/alloy/url/http' + '$2' + '"' + '$3' + ',' + '$4' + 'true')

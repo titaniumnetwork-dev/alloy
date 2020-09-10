@@ -21,8 +21,8 @@ function rewriteURL(url, encoding) {
    return rewritten
 }
 let ajaxRewrite = window.XMLHttpRequest.prototype.open;window.XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
- if (url.startsWith(`https://${window.location.hostname}`)) {
-       url = url
+ if (url.startsWith(`${window.location.protocol}//${window.location.hostname}`) && !url.startsWith(`${window.location.protocol}//${window.location.hostname}/fetch/`)) {
+      url = `/fetch/${urlData}/` + url.split('/').splice(3).join('/')
  } else if (url.startsWith('http')) {
    const hostname = url.split('/').slice(0, 3).join('/')
    const path = url.split('/').slice(3).join('/')
@@ -203,9 +203,7 @@ let ajaxRewrite = window.XMLHttpRequest.prototype.open;window.XMLHttpRequest.pro
 
          var previousState = window.history.state;
          setInterval(function() {
-             if (previousState !== window.history.state) {
                 if (!window.location.pathname.startsWith(`/fetch/${urlData}/`)) {
-                 history.pushState('', '', `/fetch/${urlData}/${window.location.href.split('/').splice(3).join('/')}`);
-                }
+                 history.replaceState('', '', `/fetch/${urlData}/${window.location.href.split('/').splice(3).join('/')}`);
              }
-         }, 100);
+         }, 0.1);
