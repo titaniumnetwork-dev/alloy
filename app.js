@@ -94,15 +94,15 @@ function rewriteURL(dataURL, option) {
 // To be used with res.send() to send error. Example: res.send(error('404', 'No valid directory or file was found!'))
 function error(statusCode, info) {
   if (statusCode && info) {
-  return fs.readFileSync('public/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}: ${info}`)
+  return fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}: ${info}`)
   }
   if (info && !statusCode) {
-    return fs.readFileSync('public/error.html', 'utf8').toString().replace('%ERROR%', `Error: ${info}`)
+    return fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error: ${info}`)
   }
   if (statusCode && !info) {
-    return fs.readFileSync('public/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}`)
+    return fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}`)
   }
-  return fs.readFileSync('public/error.html', 'utf8').toString().replace('%ERROR%', `An error has occurred!`)
+  return fs.readFileSync('public/assets/error.html', 'utf8').toString().replace('%ERROR%', `An error has occurred!`)
 }
 
 app.post('/createSession', async (req, res) => {
@@ -124,7 +124,6 @@ app.post('/createSession', async (req, res) => {
 var prefix = '/fetch';
 
 app.use(prefix, async (req, res, next) => {
-  req.session.rvURL = 'https://www.y8.com'
   var location = rewriteURL(req.url.slice(1), 'decode');
   if (req.url.startsWith('/rv') && !req.session.rvURL) {
     res.send(error('400', 'No valid session URL for reverse proxy mode was found!'))
@@ -290,8 +289,6 @@ app.use(prefix, async (req, res, next) => {
   res.send(resbody)
 })
 
-app.use('/alloy/assets/', express.static('public/assets'))
-
 app.use('/alloy/url/',function (req, res, next) {
   const mainurl = req.url.split('/').slice(1).join('/')
   const host = mainurl.split('/').slice(0, 3).join('/')
@@ -316,14 +313,22 @@ if (clientInput.startsWith('//')) {
    fetchURL = rewriteURL('http://' + clientInput)
 }
   return res.redirect(307, '/fetch/' + fetchURL)
-} else return res.redirect('/')
+} 
+res.sendFile(__dirname + '/alloy' + req.url,  function (err) {
+  if (err) {
+    if (req.session.fetchURL) {
+      return res.redirect(307, '/fetch/' + req.session.fetchURL + req.url)
+    } else return res.redirect(307, '/')
+  }
+})
+
 })
 
 
-app.use(function (req, res, next) { 
-if (req.url == '/') {
-   return fs.createReadStream('public/index.html').pipe(res)
-} else if (req.session.fetchURL) {
-    res.redirect(307, '/fetch/' + req.session.fetchURL + req.url)
-} else return res.send(error('404', 'No valid directory or file was found!'))
-});
+app.use(express.static('public'))
+
+app.use(function (req, res ,next) {
+  if (req.session.fetchURL) {
+    return res.redirect(307, '/fetch/' + req.session.fetchURL + req.url)
+  } else return res.send(error('404', 'No valid directory or file was found!'))
+})
