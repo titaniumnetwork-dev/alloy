@@ -6,7 +6,17 @@ var fs = require('fs');
 var app = express();
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
+var cluster = require('cluster');
 
+if(cluster.isMaster) {
+  var numWorkers = require('os').cpus().length;
+  for(var i = 0; i < numWorkers; i++) {
+      cluster.fork();
+  }
+  cluster.on('exit', function(worker, code, signal) {
+      cluster.fork();
+  });
+} else {
 var config = JSON.parse(fs.readFileSync('config.json', 'utf-8')),
   httpsAgent = new https.Agent({
     rejectUnauthorized: false,
@@ -335,3 +345,4 @@ res.sendFile(__dirname + '/public' + req.url,  function (err) {
 })
 
 });
+}
