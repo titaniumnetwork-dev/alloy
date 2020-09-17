@@ -6,6 +6,7 @@ var fs = require('fs');
 var app = express();
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
+var xss = require("xss");
 
 var config = JSON.parse(fs.readFileSync('config.json', 'utf-8')),
   httpsAgent = new https.Agent({
@@ -94,15 +95,15 @@ function rewriteURL(dataURL, option) {
 // To be used with res.send() to send error. Example: res.send(error('404', 'No valid directory or file was found!'))
 function error(statusCode, info) {
   if (statusCode && info) {
-  return fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}: ${info}`)
+  return xss(fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}: ${info}`))
   }
   if (info && !statusCode) {
-    return fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error: ${info}`)
+    return xss(fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error: ${info}`))
   }
   if (statusCode && !info) {
-    return fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}`)
+    return xss(fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}`))
   }
-  return fs.readFileSync('public/assets/error.html', 'utf8').toString().replace('%ERROR%', `An error has occurred!`)
+  return xss(fs.readFileSync('public/assets/error.html', 'utf8').toString().replace('%ERROR%', `An error has occurred!`))
 }
 
 app.post('/createSession', async (req, res) => {
