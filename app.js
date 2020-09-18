@@ -95,15 +95,15 @@ function rewriteURL(dataURL, option) {
 // To be used with res.send() to send error. Example: res.send(error('404', 'No valid directory or file was found!'))
 function error(statusCode, info) {
   if (statusCode && info) {
-  return xss(fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}: ${info}`))
+  return fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}: ${info}`)
   }
   if (info && !statusCode) {
-    return xss(fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error: ${info}`))
+    return (fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error: ${info}`))
   }
   if (statusCode && !info) {
-    return xss(fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}`))
+    return (fs.readFileSync('alloy/assets/error.html', 'utf8').toString().replace('%ERROR%', `Error ${statusCode}`))
   }
-  return xss(fs.readFileSync('public/assets/error.html', 'utf8').toString().replace('%ERROR%', `An error has occurred!`))
+  return (fs.readFileSync('public/assets/error.html', 'utf8').toString().replace('%ERROR%', `An error has occurred!`))
 }
 
 app.post('/createSession', async (req, res) => {
@@ -196,7 +196,7 @@ app.use(prefix, async (req, res, next) => {
     }
     return res.redirect(307, '/fetch/' + base64Encode('https://old.reddit.com') + location.path)
   }
-  const response = await fetch(location.href, options).catch(err => res.send(error('404', `"${location.href}" was not found!`)));
+  const response = await fetch(location.href, options).catch(err => res.send(error('404', `"${xss(location.href)}" was not found!`)));
   if(typeof response.buffer != 'function')return;
   var resbody = await response.buffer();
   var contentType = 'text/plain'
