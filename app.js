@@ -80,10 +80,16 @@
   app.use(`${config.prefix}utils/`, async(req, res, next) => {
       if (req.url.startsWith('/assets/')){res.sendFile(__dirname + '/utils' + req.url);}
      if (req.query.url) {
-        if (req.query.url.startsWith('https://') || req.query.url.startsWith('http://')) {
-          return res.redirect(307, config.prefix + rewrite_url(req.query.url));
-        } else return res.redirect(307, config.prefix + atob(req.query.url));
-     }
+        let url = atob(req.query.url);
+        if (url.startsWith('https://') || url.startsWith('http://')) {
+            url = url;
+        } else if (url.startsWith('//')) {
+            url = 'http:' + url; 
+        } else {
+          url = 'http://' + url;
+        }
+        return res.redirect(307, config.prefix + rewrite_url(url)); 
+        }
   });
 
   app.post(`${config.prefix}session/`, async(req, res, next) => {
