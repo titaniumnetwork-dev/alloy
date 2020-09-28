@@ -14,7 +14,7 @@ A node.js proxy that features URL encoding, and amazing compatablity!
 
 `npm start`
 
-The default place for the proxy when its started is `http://localhost:8080` but feel free to change it in config.json!
+The default prefix for Alloy Proxy will is "/proxy/" but you are free to change this in "config.json" alongside the port.
 
 # How the proxy works:
 
@@ -35,11 +35,11 @@ Since that might mess up script injection stuff.
 
 # Things not to do
 
-We recommend NOT to delete the `alloy` folder. It contains script injection and error pages. And don't tamper with any rewriting that adds script injection since script injection makes websites such as Discord and Youtube work more properly.
+We recommend NOT to delete the `utils` folder. It contains script injection and error pages. And don't tamper with any rewriting that adds script injection since script injection makes websites such as Discord and Youtube work more properly.
 
 # Extra information:
 
-If your gonna have an external website redirect to this proxy. Then we recommend you have the value base64 encoded and redirected to `/alloy?url=` then value.
+If your gonna have an external website redirect to this proxy. Then we recommend you have the value base64 encoded and redirected to `[PROXY_PREFIX]/utils/?url=` then value.
 
 # Deploying to Heroku:
 
@@ -65,11 +65,6 @@ If your gonna be hosting this on something like Heroku. You need to make sure SS
 
 and plenty more!
 
-# Known issues that need to be fixed
-
-- Better POST body parsing instead of using body-parser.
-
-- Cookie header rewriting
 
 # Updates to come in the future
 
