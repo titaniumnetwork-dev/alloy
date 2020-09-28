@@ -30,8 +30,7 @@ A porition of its rewriting is in client-side JS so `Element.setAttribute`, `win
 
 # Implementing your website in Alloyproxy
 
-To implement your website into AlloyProxy. Upload all of your files into the `public` folder then your done. Avoid having the directory `alloy`
-Since that might mess up script injection stuff.
+To implement your website into AlloyProxy. Upload all of your files into the `public` folder then your done.
 
 # Things not to do
 
