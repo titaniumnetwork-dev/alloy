@@ -116,8 +116,33 @@
 
     proxy.requestHeaders = req.headers;
     proxy.requestHeaders['host'] = proxy.url.hostname;
-    proxy.requestHeaders['referer'] = proxy.url.href;
-    proxy.requestHeaders['origin'] = proxy.url.origin;
+    if (proxy.requestHeaders['referer']) {
+      let referer =  '/' + String(proxy.requestHeaders['referer']).split('/').splice(3).join('/');
+
+      referer = rewrite_url(referer.replace(config.prefix, ''), 'decode');
+
+      if (referer.startsWith('https://') || referer.startsWith('http://')) {
+        referer = referer;
+
+      } else referer = proxy.url.href;
+
+      proxy.requestHeaders['referer'] = referer;
+    }
+
+
+    if (proxy.requestHeaders['origin']) {
+      let origin =  '/' + String(proxy.requestHeaders['origin']).split('/').splice(3).join('/');
+
+      origin = rewrite_url(origin.replace(config.prefix, ''), 'decode');
+
+      if (origin.startsWith('https://') || origin.startsWith('http://')) {
+
+        origin = origin.split('/').splice(0, 3).join('/');
+
+      } else origin = proxy.url.origin;
+
+       proxy.requestHeaders['origin'] = origin;
+    }
 
     if (proxy.requestHeaders.cookie) {
         delete proxy.requestHeaders.cookie;
@@ -243,6 +268,24 @@
   app.use('/', express.static('public'));
 
   app.use(async(req, res, next) => {
-   if (req.session.url) { return res.redirect(307, config.prefix + btoa(req.session.url) + req.url);}
-   else return next();
+   if (req.headers['referer']) {
+
+    let referer =  '/' + String(req.headers['referer']).split('/').splice(3).join('/');
+
+    referer = rewrite_url(referer.replace(config.prefix, ''), 'decode').split('/').splice(0, 3).join('/');
+
+    if (referer.startsWith('https://') || referer.startsWith('http://')) {
+      res.redirect(307, config.prefix + btoa(referer) + req.url)
+    } else {
+       if (req.session.url) {
+
+         res.redirect(307, config.prefix + btoa(req.session.url) + req.url)
+
+       } else return next();
+    }
+   } else if (req.session.url) {
+
+    res.redirect(307, config.prefix + btoa(req.session.url) + req.url)
+
+  } else return next();
   });
