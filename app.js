@@ -28,7 +28,7 @@
 
 
   console.log(`Alloy Proxy now running on ${server_protocol}0.0.0.0:${config.port}! Proxy prefix is "${config.prefix}"!`);
-  server.listen(config.port);
+  server.listen(process.env.PORT || config.port);
 
   btoa = (str) => {
     str = new Buffer.from(str).toString('base64');
