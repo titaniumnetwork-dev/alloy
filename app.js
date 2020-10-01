@@ -54,10 +54,10 @@
   };
 
   app.use(session({
-    secret: 'titanium-alloy',
-    resave: false,
+    secret: 'alloy',
     saveUninitialized: true,
-  }));
+    resave: true
+}));
 // We made our own version of body-parser instead, due to issues.
   app.use((req, res, next) => {
       if (req.method == 'POST') {
