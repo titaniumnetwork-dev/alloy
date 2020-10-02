@@ -33,6 +33,28 @@ A porition of its rewriting is in client-side JS so `Element.setAttribute`, `win
 
 To implement your website into AlloyProxy. Upload all of your files into the `public` folder then your done.
 
+# Blacklisting websites!
+
+If you don't want certain websites such as porn websites to be accessed.
+You can add a websites hostname to `blocklist.json`.
+A websites hostname is the URL of a website without any protocol, port, or path.
+
+For example:
+
+"https://discord.com/dsa/asd/sad/" = "discord.com",
+
+"https://www.example.org:8080/dsa/dsa/dsa/" = "www.example.org".
+
+Take this as an example for a good blocklist:
+
+```
+[
+"www.example.org",
+"www.example.com",
+"www.example.info"
+]
+```
+
 # Things not to do
 
 We recommend NOT to delete the `utils` folder. It contains script injection and error pages. And don't tamper with any rewriting that adds script injection since script injection makes websites such as Discord and Youtube work more properly.
