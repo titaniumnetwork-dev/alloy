@@ -174,7 +174,19 @@
   if (proxy.url.hostname == 'www.reddit.com') { return res.redirect(307, config.prefix + rewrite_url('https://old.reddit.com'));};
 
   if (!req.url.slice(1).startsWith(`${proxy.url.encoded_origin}/`)) { return res.redirect(307, config.prefix + proxy.url.encoded_origin + '/');};
+   
+  const blocklist = JSON.parse(fs.readFileSync('./blocklist.json', {encoding:'utf8'}));	  
+	
+  let is_blocked = false;	  
+	  
+  Array.from(blocklist).forEach(blocked_hostname => {
+      if (proxy.url.hostname == blocked_hostname) {
+          is_blocked = true;
+      }
+  });
   
+  if (is_blocked == true) { return res.send(fs.readFileSync('./utils/error/error.html', 'utf8').toString().replace('%ERROR%', `Error 401: The website '${sanitizer.sanitize(proxy.url.hostname)}' is not permitted!`))}	  
+	  
   proxy.response = await fetch(proxy.url.href, proxy.options).catch(err => res.send(fs.readFileSync('./utils/error/error.html', 'utf8').toString().replace('%ERROR%', `Error 400: Could not make request to '${sanitizer.sanitize(proxy.url.href)}'!`)));
 
   if(typeof proxy.response.buffer != 'function')return;
