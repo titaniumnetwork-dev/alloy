@@ -143,10 +143,6 @@
 
        proxy.requestHeaders['origin'] = origin;
     }
-
-    if (proxy.requestHeaders.cookie) {
-        delete proxy.requestHeaders.cookie;
-    }
     const httpAgent = new http.Agent({
 	  keepAlive: true
     });
