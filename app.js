@@ -150,6 +150,7 @@
 	  keepAlive: true
     });
     const httpsAgent = new https.Agent({
+	  rejectUnauthorized: false,
 	  keepAlive: true
     });
     proxy.options = {
