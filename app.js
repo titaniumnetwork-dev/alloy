@@ -6,6 +6,7 @@
   querystring = require('querystring'),
   session = require('express-session'),
   sanitizer = require('sanitizer'),
+  websocket = require('./ws-proxy.js'),
   fetch = require('node-fetch');
 
   const config = JSON.parse(fs.readFileSync('./config.json', {encoding:'utf8'})); 
@@ -26,6 +27,8 @@
   if (config.ssl == true) { server = https.createServer(server_options, app); server_protocol = 'https://';}
   else { server = http.createServer(app); server_protocol = 'http://';};
 
+  // WebSocket Proxying
+  websocket(server);
 
   console.log(`Alloy Proxy now running on ${server_protocol}0.0.0.0:${config.port}! Proxy prefix is "${config.prefix}"!`);
   server.listen(process.env.PORT || config.port);
