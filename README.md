@@ -30,31 +30,30 @@ When a attribute is rewritten, depending on the contents inside. It will turn:
 A porition of its rewriting is in client-side JS so `Element.setAttribute`, `window.fetch()`, XMLHttpRequest, and more are rewritten.
 
 # Recommended Nginx config.
-
+```
 location / {    
-  
-			  proxy_set_header Accept-Encoding "";
+  proxy_set_header Accept-Encoding "";
 
-	   		proxy_set_header Host $host;
+  proxy_set_header Host $host;
 
-	   		proxy_set_header X-Real-IP $remote_addr;
+  proxy_set_header X-Real-IP $remote_addr;
 
-	   		proxy_set_header X-Forwarded-Host $host:$server_port;
+  proxy_set_header X-Forwarded-Host $host:$server_port;
 
-	   		proxy_set_header X-Forwarded-Server $host;
+  proxy_set_header X-Forwarded-Server $host;
 
-	   		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
  
-        // These headers are necessary for the WebSocket proxy to work.
+  # These headers are necessary for the WebSocket proxy to work.
  
-        proxy_set_header Upgrade $http_upgrade;
+  proxy_set_header Upgrade $http_upgrade;
 
-        proxy_set_header Connection "Upgrade";        
+  proxy_set_header Connection "Upgrade";        
 
-        proxy_pass http://url-to-alloy:8080;
+  proxy_pass http://url-to-alloy:8080;
    
 } 
-
+```
 
 
 
