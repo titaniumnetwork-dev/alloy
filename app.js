@@ -17,7 +17,7 @@ const $ = require('./modules/functions.js');
 const config = JSON.parse(fs.readFileSync('config/config.json', {encoding:'utf8'}));
 const blocklist = JSON.parse(fs.readFileSync('config/blocklist.json', {encoding:'utf8'}));
 // Ensure prefix is defined properly
-config.prefix = "/" + config.prefix.replace(/^\/+|\/+$/g, '') + "/";
+config.prefix = '/' + config.prefix.replace(/^\/+|\/+$/g, '') + '/';
 
 // Read SSL keys
 const server_options = {
@@ -66,37 +66,46 @@ app.use((req, res, next) => {
     }
 });
 
+// Serve inject script and error page
 app.use(config.prefix + 'utils/', async(req, res, next) => {
     if (req.url.startsWith('/assets/')){
         res.sendFile(__dirname + '/utils' + req.url);
     }
+    // Whoops. Send them back to the proxy
     if (req.query.url) {
         let url = $.atob(req.query.url);
 
+        // Ensure correct protocol
         if (url.startsWith('//')) {
             url = 'http:' + url;
         } else {
             url = 'http://' + url;
         }
 
+        // Redirect to proxy
         return res.redirect(307, config.prefix + $.rewrite_url(url));
     }
 });
 
+// Begin session
 app.post(config.prefix + 'session/', async(req, res, next) => {
     let url = querystring.parse(req.raw_body).url;
 
+    // Ensure correct protocol
     if (url.startsWith('//')) {
         url = 'http:' + url;
     } else if (!url.startsWith('https://') && !url.startsWith('http://')) {
         url = 'http://' + url;
     }
 
+    // Redirect to proxy
     return res.redirect(config.prefix + $.rewrite_url(url));
 });
 
+// Main proxy route
 app.use(config.prefix, async(req, res, next) => {
     var proxy = {};
+    // Format url
     proxy.url = $.rewrite_url(req.url.slice(1), 'decode');
     proxy.url = {
         href: proxy.url,
@@ -109,13 +118,16 @@ app.use(config.prefix, async(req, res, next) => {
 
     proxy.url.encoded_origin = $.btoa(proxy.url.origin);
 
+    // Grab headers
     proxy.requestHeaders = req.headers;
     proxy.requestHeaders['host'] = proxy.url.hostname;
 
+    // Grab and rewrite referrer
     if (proxy.requestHeaders['referer']) {
         let referer =  '/' + String(proxy.requestHeaders['referer']).split('/').splice(3).join('/');
         referer = $.rewrite_url(referer.replace(config.prefix, ''), 'decode');
 
+        // Hmm, referer is not a url, so lets just use the request url.
         if (!referer.startsWith('https://') && !referer.startsWith('http://')) {
             referer = proxy.url.href;
         }
@@ -123,11 +135,12 @@ app.use(config.prefix, async(req, res, next) => {
         proxy.requestHeaders['referer'] = referer;
     }
 
-
+    // Grab and rewrite origin
     if (proxy.requestHeaders['origin']) {
         let origin =  '/' + String(proxy.requestHeaders['origin']).split('/').splice(3).join('/');
         origin = $.rewrite_url(origin.replace(config.prefix, ''), 'decode');
 
+        // Either rewrite the origin to fit, or simply use the req url.
         if (origin.startsWith('https://') || origin.startsWith('http://')) {
             origin = origin.split('/').splice(0, 3).join('/');
         } else {
@@ -137,6 +150,7 @@ app.use(config.prefix, async(req, res, next) => {
         proxy.requestHeaders['origin'] = origin;
     }
 
+    // fuck cookies
     if (proxy.requestHeaders.cookie) {
         delete proxy.requestHeaders.cookie;
     }
@@ -149,6 +163,7 @@ app.use(config.prefix, async(req, res, next) => {
         keepAlive: true
     });
 
+    // Throw it all together
     proxy.options = {
         method: req.method,
         headers: proxy.requestHeaders,
@@ -166,9 +181,11 @@ app.use(config.prefix, async(req, res, next) => {
         proxy.options.body = req.str_body;
     }
 
+    // No point in the homepage for discord, guide them to the login
     if (proxy.url.hostname == 'discord.com' && proxy.url.path == '/') {
         return res.redirect(307, config.prefix + $.rewrite_url('https://discord.com/login'));
     }
+    // New reddit doesn't load properly, push them to old reddit
     if (proxy.url.hostname == 'www.reddit.com') {
         return res.redirect(307, config.prefix + $.rewrite_url('https://old.reddit.com'));
     }
@@ -176,6 +193,7 @@ app.use(config.prefix, async(req, res, next) => {
         return res.redirect(307, config.prefix + proxy.url.encoded_origin + '/');
     }
 
+    // If url is on the blacklist, return error.
     let is_blocked = false;
 
     Array.from(blocklist).forEach(blocked_hostname => {
@@ -184,22 +202,27 @@ app.use(config.prefix, async(req, res, next) => {
         }
     });
 
+    // Actually request the url.
     proxy.response = await fetch(proxy.url.href, proxy.options).catch(err => res.send(fs.readFileSync('./utils/error/error.html', 'utf8').toString().replace('%ERROR%', 'Error 400: Could not make request to ' + sanitizer.sanitize(proxy.url.href))));
 
+    // Strange scenario, just return
     if (typeof proxy.response.buffer != 'function') {
         return;
     }
 
     proxy.buffer = await proxy.response.buffer();
 
+    // default to a text file
     proxy.content_type = 'text/plain';
 
+    // if content-type is set by the server, use that
     proxy.response.headers.forEach((e, i, a) => {
         if (i == 'content-type') {
             proxy.content_type = e;
         }
     });
 
+    // If it still doesn't exist, it's probably html.
     if (proxy.content_type == null || typeof proxy.content_type == 'undefined') {
         proxy.content_type = 'text/html';
     }
@@ -227,8 +250,10 @@ app.use(config.prefix, async(req, res, next) => {
     res.set(proxy.headers);
     res.contentType(proxy.content_type);
 
+    // Rewrite html. The assets and other web requests now come to alloy.
     if (proxy.content_type.startsWith('text/html')) {
         req.session.url = proxy.url.origin;
+        // Change hrefs, src, data, etc. Wipe checksums. Change JS url redirects. Inject our script.
         proxy.sendResponse = proxy.sendResponse.toString()
          .replace(/integrity="(.*?)"/gi, '')
          .replace(/nonce="(.*?)"/gi, '')
@@ -257,6 +282,7 @@ app.use(config.prefix, async(req, res, next) => {
           proxy.sendResponse = proxy.sendResponse.replace(/\/results/gi, `${config.prefix}${proxy.url.encoded_origin}/results`);
        }
     } else if (proxy.content_type.startsWith('text/css')) {
+      //Rewrite css files. Mostly just to ensure background-imgs, and other external assets get loaded.
         proxy.sendResponse = proxy.sendResponse.toString()
          .replace(/url\("\/\/(.*?)"\)/gi, `url("http://` + `$1` + `")`)
          .replace(/url\('\/\/(.*?)'\)/gi, `url('http://` + `$1` + `')`)
@@ -282,6 +308,7 @@ app.use(config.prefix, async(req, res, next) => {
     res.send(proxy.sendResponse);
 });
 
+// Serve homepage.
 app.use('/', express.static('public'));
 
 app.use(async(req, res, next) => {
@@ -306,4 +333,5 @@ app.use(async(req, res, next) => {
 });
 
 console.log(`Alloy Proxy now running on ${server_protocol}0.0.0.0:${config.port}! Proxy prefix is "${config.prefix}"!`);
+$.log('MAIN', 'Alloy Started');
 server.listen(process.env.PORT || config.port);
