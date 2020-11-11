@@ -23,4 +23,51 @@ Module specialized in proxying websites to unblock the web.
     localAddress: [] // Neat feature in basic http(s).request() to choose what IP to use to make the request. Will be randomized if there is multiple.
 ```
 
+# How to use "request" and "response" options in the config.
+
+To use the "request" and "response" options in the config. You must make a function like this for example.
+
+```
+customFunction = (proxy) => {
+
+  if (proxy.url.hostname == 'example.org') console.log('weee :3');  
+
+};
+
+prefix: '/prefix/',
+    blocklist: [],
+    // error: (proxy) => { return res.end('proxy.error.info.message') },  Custom error handling which is optional.
+    request: [], // Add custom functions before request is made or modify the request.
+    response: [
+    
+        customFunction
+    
+    ], // Add custom functions after the request is made or modify the response.
+    injection: true, // Script injection which is helpful in rewriting window.fetch() and all kinds of client-side JS requests.
+    requestAgent: null, // Set a custom agent to use in the request.
+    // userAgent: Uses the clients "User-Agent" request header by default. More customizable using the "request" option in the configs.
+    localAddress: [] // Neat feature in basic http(s).request() to choose what IP to use to make the request. Will be randomized if there is multiple.
+
+```
+
+What this will do is when the hostname of a website being accessed is `example.org`. The console sends you "weee :3". If you want a preview of what options you have, heres a list. :)
+
+```
+
+proxy.req // This is the request option in HTTP servers. If Express.js is being used, you can use Express.js functions.
+proxy.res // This is the response option in HTTP servers. If Express.js is being used, you can use Express.js functions.
+proxy.next() // This is only avaliable in Express.js . If used in native HTTP, the app will display blank text as a filler.
+
+proxy.request.headers // A modified version of the client's request headers used in sending the request.
+proxy.request.method // The clients request method.
+proxy.request.body // The POST body of a POST / PATCH request. 
+
+proxy.response // The entire response of the website. Contains headers, JSON / text response, and all Node.js http(s).request() response data.
+proxy.response.headers // Response headers the website gave back. Is modified to filter out bad headers, and rewrite "Set-Cookie" header.
+proxy.sendResponse // The modified response buffer the website gave back. You can modify it in anyway you desire. :)
+
+```
+
+
+
 
