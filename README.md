@@ -34,20 +34,21 @@ customFunction = (proxy) => {
 
 };
 
+new Alloy({
 prefix: '/prefix/',
-    blocklist: [],
-    // error: (proxy) => { return res.end('proxy.error.info.message') },  Custom error handling which is optional.
-    request: [], // Add custom functions before request is made or modify the request.
-    response: [
+blocklist: [],
+// error: (proxy) => { return res.end('proxy.error.info.message') },  Custom error handling which is optional.
+request: [], // Add custom functions before request is made or modify the request.
+response: [
     
-        customFunction
+  customFunction
     
-    ], // Add custom functions after the request is made or modify the response.
-    injection: true, // Script injection which is helpful in rewriting window.fetch() and all kinds of client-side JS requests.
-    requestAgent: null, // Set a custom agent to use in the request.
-    // userAgent: Uses the clients "User-Agent" request header by default. More customizable using the "request" option in the configs.
-    localAddress: [] // Neat feature in basic http(s).request() to choose what IP to use to make the request. Will be randomized if there is multiple.
-
+], // Add custom functions after the request is made or modify the response.
+injection: true, // Script injection which is helpful in rewriting window.fetch() and all kinds of client-side JS requests.
+requestAgent: null, // Set a custom agent to use in the request.
+// userAgent: Uses the clients "User-Agent" request header by default. More customizable using the "request" option in the configs.
+localAddress: [] // Neat feature in basic http(s).request() to choose what IP to use to make the request. Will be randomized if there is multiple.
+})
 ```
 
 What this will do is when the hostname of a website being accessed is `example.org`. The console sends you "weee :3". If you want a preview of what options you have, heres a list. :)
