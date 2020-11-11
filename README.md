@@ -54,17 +54,32 @@ What this will do is when the hostname of a website being accessed is `example.o
 
 ```
 
+// Basic HTTP functions.
+
 proxy.req // This is the request option in HTTP servers. If Express.js is being used, you can use Express.js functions.
 proxy.res // This is the response option in HTTP servers. If Express.js is being used, you can use Express.js functions.
 proxy.next() // This is only avaliable in Express.js . If used in native HTTP, the app will display blank text as a filler.
+
+// Request
 
 proxy.request.headers // A modified version of the client's request headers used in sending the request.
 proxy.request.method // The clients request method.
 proxy.request.body // The POST body of a POST / PATCH request. 
 
+// Response
+
 proxy.response // The entire response of the website. Contains headers, JSON / text response, and all Node.js http(s).request() response data.
 proxy.response.headers // Response headers the website gave back. Is modified to filter out bad headers, and rewrite "Set-Cookie" header.
 proxy.sendResponse // The modified response buffer the website gave back. You can modify it in anyway you desire. :)
+
+// Errors
+
+proxy.error.status // Outputs "true" when theres an error.
+proxy.error.info // Gives information about an error.
+proxy.error.info.code // Gives error code. Error codes such as "ENOTFOUND" mean a website could not be found. "BLOCKED" means a website is blocked.
+proxy.error.info.message // Gives error message.
+proxy.blocked.status // Outputs "true" when a filtered hostname is detected.
+
 
 ```
 
