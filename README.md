@@ -30,7 +30,11 @@ To use the "request" and "response" options in the config. You must make a funct
 ```
 customFunction = (proxy) => {
 
-  if (proxy.url.hostname == 'example.org') console.log('weee :3');  
+  if (proxy.url.hostname == 'example.org' && proxy.response.headers['content-type'].startsWith('text/html')) {
+  
+    return proxy.sendResponse == proxy.sendResponse.toString().replace(/example/gi, 'cat :3');
+  
+  };
 
 };
 
