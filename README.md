@@ -151,6 +151,8 @@ location / {
 } 
 ```
 
+Apache config needs to be added. 
+
 
 
 
