@@ -128,6 +128,29 @@ proxy.blocked.status // Outputs "true" when a filtered hostname is detected.
 
 Alloy does come with a built in websocket proxy. To use it, you must have an HTTP server already defined. The example of using Alloy as Express middleware already uses the websocket proxy.
 
+# Using Nginx or Apache for proxying.
+
+A reminder that if your using Nginx / Apache for proxying this, then the websocket proxy will not work without `Connection` and `Upgrade` headers.
+
+Nginx config example:
+
+```
+location / {
+
+    proxy_set_header Accept-Encoding "";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-Host $host:$server_port;
+    proxy_set_header X-Forwarded-Server $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    # These headers are necessary for the WebSocket proxy to work.
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "Upgrade";        
+    proxy_pass http://url-to-alloy:8080;
+   
+} 
+```
+
 
 
 
