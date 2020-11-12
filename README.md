@@ -91,7 +91,7 @@ localAddress: [] // Neat feature in basic http(s).request() to choose what IP to
 })
 ```
 
-What this will do is when the hostname of a website being accessed is `example.org`. The console sends you "weee :3". If you want a preview of what options you have, heres a list. :)
+What this will do is when the hostname of a website being accessed is `example.org`. The keyword "example" would be replaced with "cat :3".
 
 ```
 
