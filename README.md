@@ -45,7 +45,8 @@ server.listen('8080')
 
 # Configurations
 
-```
+`
+{
     prefix: '/prefix/',
     blocklist: [],
     // error: (proxy) => { return res.end('proxy.error.info.message') },  Custom error handling which is optional.
@@ -55,7 +56,8 @@ server.listen('8080')
     requestAgent: null, // Set a custom agent to use in the request.
     // userAgent: Uses the clients "User-Agent" request header by default. More customizable using the "request" option in the configs.
     localAddress: [] // Neat feature in basic http(s).request() to choose what IP to use to make the request. Will be randomized if there is multiple.
-```
+}    
+`
 
 # How to use "request" and "response" options in the config.
 
