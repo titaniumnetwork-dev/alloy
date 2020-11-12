@@ -45,7 +45,7 @@ server.listen('8080')
 
 # Configurations
 
-`
+```
 {
     prefix: '/prefix/',
     blocklist: [],
@@ -57,7 +57,7 @@ server.listen('8080')
     // userAgent: Uses the clients "User-Agent" request header by default. More customizable using the "request" option in the configs.
     localAddress: [] // Neat feature in basic http(s).request() to choose what IP to use to make the request. Will be randomized if there is multiple.
 }    
-`
+```
 
 # How to use "request" and "response" options in the config.
 
