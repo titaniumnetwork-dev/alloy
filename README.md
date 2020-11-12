@@ -11,6 +11,8 @@ Module specialized in proxying websites to unblock the web.
 
 A good example of what code to use is here using the Express.js framework.
 
+If you're a beginner then I recommend you use this snippet of code!
+
 ```
 
 // Note: make sure you use Alloy before any other Express middleware that sends responses to client or handles POST data. 
