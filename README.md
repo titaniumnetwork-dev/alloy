@@ -9,6 +9,38 @@ Module specialized in proxying websites to unblock the web.
 
 3. Start up your app and unblock a website at `/prefix/[BASE64 ENCODED WEBSITE ORIGIN]/`. The path of the website does not have to be B64 encoded.
 
+A good example of what code to use is here using the Express.js framework.
+
+```
+
+// Note: make sure you use Alloy before any other Express middleware that sends responses to client or handles POST data. 
+
+const Alloy = require('alloyproxy'),
+    http = require('http'),
+    express = require('express'),
+    app = express();
+    
+const server = http.createServer(app);   
+
+const Unblocker = new Alloy({
+    prefix: '/fetch/',
+    request: [],
+    response: [],
+    injection: true,
+});    
+ 
+// The main part of the proxy. 
+ 
+app.use(Unblocker.app);    
+
+// WebSocket handler.
+
+Unblocker.ws(server);    
+
+server.listen('8080')
+
+```
+
 # Configurations
 
 ```
