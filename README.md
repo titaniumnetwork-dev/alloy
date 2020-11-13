@@ -154,4 +154,3 @@ proxy.blocked.status // Outputs "true" when a filtered hostname is detected.
 
 Alloy does come with a built in websocket proxy. To use it, you must have an HTTP server already defined. The example of using Alloy as Express middleware already uses the websocket proxy.
 
-

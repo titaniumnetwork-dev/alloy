@@ -1,10 +1,8 @@
 var alloy_data = document.querySelector('#_alloy_data');
 
-var url = alloy_data.getAttribute('url');
-
 var prefix = alloy_data.getAttribute('prefix');
 
-url = new URL(atob(url))
+var url = new URL(atob(alloy_data.getAttribute('url')))
 
 rewrite_url = (str) => {
     proxied_url = '';
@@ -86,12 +84,26 @@ let setattribute_rewrite = window.Element.prototype.setAttribute; window.Element
         return new target(args_array);
       }
     
-    }); 
+    });
+  
+  // Rewriting incoming pushstate.
 
+  history.pushState = new Proxy(history.pushState, {
+
+     apply: (target, thisArg, args_array) => {
+         
+         args_array[2] = rewrite_url(args_array[2])
+
+         return target.apply(thisArg, args_array)
+     }
+
+  });
 
 var previousState = window.history.state;
 setInterval(function() {
+
        if (!window.location.pathname.startsWith(`${prefix}${btoa(url.origin)}/`)) {
+
         history.replaceState('', '', `${prefix}${btoa(url.origin)}/${window.location.href.split('/').splice(3).join('/')}`);
     }
 }, 0.1);

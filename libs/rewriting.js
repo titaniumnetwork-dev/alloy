@@ -136,18 +136,52 @@ referer = (referer, config) => {
 
 	return referer;
 
-}
+};
+
+
+headers = (proxy) => {
+
+    Object.entries(proxy.response.headers).forEach(([header_name, header_value]) => {
+
+        if (header_name == 'location') {
+            proxy.response.statusCode = 308;
+            proxy.response.headers[header_name] = proxy.prefix + url(header_value);
+        };
+
+        if (header_name == 'set-cookie') {
+
+            var array = [];
+
+            header_value.forEach(cookie => {
+
+                cookie = cookie.replace(/Domain=(.*?);/gi, `Domain=` + proxy.req.headers['host'] + ';').replace(/(.*?)=(.*?);/, '$1' + '@' + proxy.url.hostname + `=` + '$2' + ';');
+
+                array.push(cookie);
+
+            });
+
+            proxy.response.headers[header_name] = array;
+
+        };
+
+        if (header_name.startsWith('content-encoding') || header_name.startsWith('x-') || header_name.startsWith('cf-') || header_name.startsWith('strict-transport-security') || header_name.startsWith('content-security-policy') || header_name.startsWith('content-length')) {
+
+            delete proxy.response.headers[header_name];
+
+        };
+
+    });
+
+};
 
 // Setting all our functions to be used in "proxy.js"
 
 module.exports = {
 
 	url: url,
-
 	body: body,
-
 	origin: origin,
-
-	referer: referer
+	referer: referer,
+	headers: headers
 
 }

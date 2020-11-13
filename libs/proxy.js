@@ -109,13 +109,13 @@ module.exports = (config) => {
 				proxy.error.info = {
 
 					code: 'ENOTFOUND',
-					message: `Could not make ${req.method} request to ${rewrite.url(req.url.replace(config.prefix, ''), 'decode')}.` 
+					message: `Could not make ${req.method} request to "${rewrite.url(req.url.replace(config.prefix, ''), 'decode')}".` 
 
 				};
 
 				if (config.error) return config.error(proxy);
 
-				return res.end(proxy.error.info.message);
+				return res.end(proxy.error.info.message.replace(/</gi, '<&zwnj;').replace(/>/gi, '>&zwnj;'));
 
 			};
 
@@ -177,7 +177,7 @@ module.exports = (config) => {
 
 						code: 'BLOCKED',
 
-						message: `Could not make ${req.method} request to ${rewrite.url(req.url.replace(config.prefix, ''), 'decode')}.` 
+						message: `Could not make ${req.method} request to "${rewrite.url(req.url.replace(config.prefix, ''), 'decode')}".` 
 
 					}
 
@@ -191,7 +191,7 @@ module.exports = (config) => {
 
 				if (config.error) return config.error(proxy);
 
-				return res.end(proxy.error.info.message);
+				return res.end(proxy.error.info.message.replace(/</gi, '<&zwnj;').replace(/>/gi, '>&zwnj;'));
 
 			}
 			// In http.request(), there is a feature to choose what IP you want to use when making the request. This is useful when your server has additional IP's.
@@ -222,7 +222,7 @@ module.exports = (config) => {
 
 					code: err.code,
 
-					message: `Could not make ${req.method} request to ${rewrite.url(req.url.replace(config.prefix, ''), 'decode')}.` 
+					message: `Could not make ${req.method} request to "${rewrite.url(req.url.replace(config.prefix, ''), 'decode')}".` 
 
 				};
 
@@ -233,7 +233,7 @@ module.exports = (config) => {
 
 				if (config.error) return config.error(proxy);
 
-				return res.end(proxy.error.info.message);
+				return res.end(proxy.error.info.message.replace(/</gi, '<&zwnj;').replace(/>/gi, '>&zwnj;'));
 
 			}
 
@@ -241,36 +241,7 @@ module.exports = (config) => {
 
 			// Filtering out bad headers, setting redirect locations, and rewriting cookies.
 
-			Object.entries(proxy.response.headers).forEach(([header_name, header_value]) => {
-
-				if (header_name == 'location') {
-					proxy.response.statusCode = 308;
-					proxy.response.headers[header_name] = config.prefix + rewrite.url(header_value);
-				};
-
-				if (header_name == 'set-cookie') {
-
-					var array = [];
-
-					header_value.forEach(cookie => {
-
-						cookie = cookie.replace(/Domain=(.*?);/gi, `Domain=` + req.headers['host'] + ';').replace(/(.*?)=(.*?);/, '$1' + '@' + proxy.url.hostname + `=` + '$2' + ';');
-
-						array.push(cookie);
-
-					});
-
-					proxy.response.headers[header_name] = array;
-
-				};
-
-				if (header_name.startsWith('content-encoding') || header_name.startsWith('x-') || header_name.startsWith('cf-') || header_name.startsWith('strict-transport-security') || header_name.startsWith('content-security-policy') || header_name.startsWith('content-length')) {
-
-					delete proxy.response.headers[header_name];
-
-				};
-
-			});
+			rewrite.headers(proxy);
 
 			// Setting response status and headers.
 
@@ -301,4 +272,4 @@ module.exports = (config) => {
 
 	};
 
-};
+}
