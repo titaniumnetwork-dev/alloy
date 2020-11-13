@@ -1,7 +1,18 @@
 # AlloyProxy
 Module specialized in proxying websites to unblock the web.
 
-# How to use
+## Table of contents:
+
+- [Setup](#how-to-use)
+    - [Module Use](#module-use)
+    - [Sample Implementation](#sample-express-application)
+	- [Sample Implementation Extended](#sample-implementation)
+	- [Configurations](#configurations)
+        - [General Use](#general-use)
+        - [Extended Configuration Information](#extended-configuration-information)
+	- [Websocket Proxy Information](#websocket-proxy-information)
+
+### Module Use
 
 1. `npm install alloyproxy`
 
@@ -11,11 +22,27 @@ Module specialized in proxying websites to unblock the web.
 
 A good example of what code to use is here using the Express.js framework.
 
-If you're a beginner then I recommend you use this snippet of code!
+### Sample Express Application
+1. Navigate to the `/examples/` folder.
+
+2. Do the following commands:
 
 ```
+cd examples/express
 
-// Note: make sure you use Alloy before any other Express middleware that sends responses to client or handles POST data. 
+npm install
+
+npm start
+```
+
+The demo application will run at `localhost:8080` by default however the port can be configured in `config.json`.
+
+The static folder provides you with the base site if you wish to go manual about this.
+
+### Sample Implementation 
+Add this to your server-side script ex. "app.js".
+```
+// Note: make sure you use Alloy before any other Express middleware that sends responses to client or handles POST data.
 
 const Alloy = require('alloyproxy'),
     http = require('http'),
@@ -43,23 +70,22 @@ server.listen('8080')
 
 ```
 
-# Configurations
+## Configurations
+### General Use
 
 ```
-{
     prefix: '/prefix/',
     blocklist: [],
-    // error: (proxy) => { return res.end('proxy.error.info.message') },  Custom error handling which is optional.
+    // error: (proxy) => { return proxy.res.end('proxy.error.info.message') },  Custom error handling which is optional.
     request: [], // Add custom functions before request is made or modify the request.
     response: [], // Add custom functions after the request is made or modify the response.
     injection: true, // Script injection which is helpful in rewriting window.fetch() and all kinds of client-side JS requests.
     requestAgent: null, // Set a custom agent to use in the request.
     // userAgent: Uses the clients "User-Agent" request header by default. More customizable using the "request" option in the configs.
     localAddress: [] // Neat feature in basic http(s).request() to choose what IP to use to make the request. Will be randomized if there is multiple.
-}    
 ```
 
-# How to use "request" and "response" options in the config.
+### Extended Configuration Information
 
 To use the "request" and "response" options in the config. You must make a function like this for example.
 
@@ -91,7 +117,7 @@ localAddress: [] // Neat feature in basic http(s).request() to choose what IP to
 })
 ```
 
-What this will do is when the hostname of a website being accessed is `example.org`. The keyword "example" would be replaced with "cat :3".
+What this will do is when the hostname of a website being accessed is `example.org`. The console sends you "weee :3". If you want a preview of what options you have, heres a list. :)
 
 ```
 
@@ -124,37 +150,8 @@ proxy.blocked.status // Outputs "true" when a filtered hostname is detected.
 
 ```
 
-# Websocket Proxy
+## Websocket Proxy Information
 
 Alloy does come with a built in websocket proxy. To use it, you must have an HTTP server already defined. The example of using Alloy as Express middleware already uses the websocket proxy.
-
-# Using Nginx or Apache for proxying.
-
-A reminder that if your using Nginx / Apache for proxying this, then the websocket proxy will not work without `Connection` and `Upgrade` headers.
-
-Nginx config example:
-
-```
-location / {
-
-    proxy_set_header Accept-Encoding "";
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-Host $host:$server_port;
-    proxy_set_header X-Forwarded-Server $host;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    # These headers are necessary for the WebSocket proxy to work.
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "Upgrade";        
-    proxy_pass http://url-to-alloy:8080;
-   
-} 
-```
-
-Apache config needs to be added. 
-
-
-
-
 
 
