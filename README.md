@@ -1,6 +1,8 @@
 # AlloyProxy
 Module specialized in proxying websites to unblock the web.
 
+For an easy to deploy repo, go to https://github.com/titaniumnetwork-dev/alloyproxy.org .
+
 ## Table of contents:
 
 - [Setup](#how-to-use)
