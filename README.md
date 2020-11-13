@@ -5,14 +5,13 @@ For an easy to deploy repo, go to https://github.com/titaniumnetwork-dev/alloypr
 
 ## Table of contents:
 
-- [Setup](#how-to-use)
+- [Setup](#alloyproxy)
     - [Module Use](#module-use)
-    - [Sample Implementation](#sample-express-application)
-	- [Sample Implementation Extended](#sample-implementation)
-	- [Configurations](#configurations)
+    - [Sample Implementation](#sample-implementation)
+    - [Configurations](#configurations)
         - [General Use](#general-use)
         - [Extended Configuration Information](#extended-configuration-information)
-	- [Websocket Proxy Information](#websocket-proxy-information)
+    - [Websocket Proxy Information](#websocket-proxy-information)
 
 ### Module Use
 
@@ -24,25 +23,10 @@ For an easy to deploy repo, go to https://github.com/titaniumnetwork-dev/alloypr
 
 A good example of what code to use is here using the Express.js framework.
 
-### Sample Express Application
-1. Navigate to the `/examples/` folder.
-
-2. Do the following commands:
-
-```
-cd examples/express
-
-npm install
-
-npm start
-```
-
-The demo application will run at `localhost:8080` by default however the port can be configured in `config.json`.
-
-The static folder provides you with the base site if you wish to go manual about this.
-
 ### Sample Implementation 
 Add this to your server-side script ex. "app.js".
+
+A sample `app.js` has been provided to demonstrate the sample implementation below at `/examples/`.
 ```
 // Note: make sure you use Alloy before any other Express middleware that sends responses to client or handles POST data.
 
