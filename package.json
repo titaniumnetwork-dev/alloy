@@ -1,28 +1,17 @@
 {
-  "name": "alloyproxy",
-  "version": "1.1.0",
-  "description": "Proxy library to unblock the web!",
-  "main": "index.js",
+  "name": "alloy-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/titaniumnetwork-dev/alloyproxy.git"
-  },
-  "keywords": [
-    "proxy",
-    "unblocker",
-    "web",
-    "proxy"
-  ],
-  "author": "Titanium Network",
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/titaniumnetwork-dev/alloyproxy/issues"
-  },
-  "homepage": "https://github.com/titaniumnetwork-dev/alloyproxy#readme",
   "dependencies": {
-    "ws": "^7.4.0"
+    "alloyproxy": "^1.1.0",
+    "cookie-parser": "^1.4.5",
+    "express": "^4.17.1"
   }
 }

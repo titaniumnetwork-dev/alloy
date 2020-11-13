@@ -1,0 +1,6 @@
+{
+    "prefix": "/get/",
+    "ssl": true,
+    "port": "443",
+    "cookie_auth": "__alloy_client=human"
+}
