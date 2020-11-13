@@ -103,7 +103,7 @@ customFunction = (proxy) => {
 new Alloy({
 prefix: '/prefix/',
 blocklist: [],
-// error: (proxy) => { return res.end('proxy.error.info.message') },  Custom error handling which is optional.
+// error: (proxy) => { return proxy.res.end('proxy.error.info.message') },  Custom error handling which is optional.
 request: [], // Add custom functions before request is made or modify the request.
 response: [
     
