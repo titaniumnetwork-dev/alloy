@@ -76,18 +76,6 @@ module.exports = (config) => {
 
 				},
 
-				// Defining and parsing URL.
-
-				url: {
-
-					href: rewrite.url(req.url.replace(config.prefix, ''), 'decode'),
-
-					origin: rewrite.url(req.url.replace(config.prefix, ''), 'decode').split('/').splice(0, 3).join('/'),
-
-					hostname: rewrite.url(req.url.replace(config.prefix, ''), 'decode').split('/').splice(0, 3).join('/').split('/').splice(2).join('/')
-
-				},
-
 				error: {
 
 					status: false,
@@ -109,6 +97,25 @@ module.exports = (config) => {
 				req: req,
 				res: res,
 				next: next,
+
+			};
+
+			try { proxy.url = new URL(rewrite.url(req.url.replace(config.prefix, ''), 'decode')); } catch(err) {
+
+				proxy.error.status = true;
+
+				// Using 404 error as a filler for this. 
+
+				proxy.error.info = {
+
+					code: 'ENOTFOUND',
+					message: `Could not make ${req.method} request to ${rewrite.url(req.url.replace(config.prefix, ''), 'decode')}.` 
+
+				};
+
+				if (config.error) return config.error(proxy);
+
+				return res.end(proxy.error.info.message);
 
 			};
 
@@ -170,7 +177,7 @@ module.exports = (config) => {
 
 						code: 'BLOCKED',
 
-						message: `The URL you tried to ${req.method} is not permitted!`
+						message: `Could not make ${req.method} request to ${rewrite.url(req.url.replace(config.prefix, ''), 'decode')}.` 
 
 					}
 
@@ -215,9 +222,9 @@ module.exports = (config) => {
 
 					code: err.code,
 
-					message: err.message
+					message: `Could not make ${req.method} request to ${rewrite.url(req.url.replace(config.prefix, ''), 'decode')}.` 
 
-				}
+				};
 
 			});
 
@@ -294,4 +301,4 @@ module.exports = (config) => {
 
 	};
 
-}
+};
