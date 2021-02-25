@@ -49,7 +49,7 @@ const http = require('http'),
 // Websocket proxy.
 proxy.ws(server);
 
-server.listen(config.port, () => console.log(`${config.ssl ? 'https://' : 'http://'}0.0.0.0:${config.port}`))
+server.listen(process.env.PORT || config.port, () => console.log(`${config.ssl ? 'https://' : 'http://'}0.0.0.0:${config.port}`))
 
 
 
