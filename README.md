@@ -1,7 +1,7 @@
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/titaniumnetwork-dev/alloyproxy)
 
 # AlloyProxy
-Module specialized in proxying websites to unblock the web.
+Deprecation Warning: Alloy on this repo is currently outdated! This repo will update soon once its ready!
 
 For an easy to deploy repo, go to https://github.com/titaniumnetwork-dev/alloyproxy.org .
 
