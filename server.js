@@ -19,7 +19,11 @@ const http = require('http'),
 
       if (req.query.url && (req.pathname == '/prox' || req.pathname == '/prox/' || req.pathname == '/session' || req.pathname == '/session/')) {
         var url = atob(req.query.url);
-
+        
+        if (!url.includes('.')) {
+			url.replace(' ', '+')
+			url = `https://google.com/search?q=${url}`
+		}
         if (url.startsWith('https://') || url.startsWith('http://')) url = url;
         else if (url.startsWith('//')) url = 'http:' + url;
         else url = 'http://' + url;
